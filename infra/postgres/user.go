@@ -1,5 +1,7 @@
 package postgres
 
+import "github.com/pedrosantosbr/proto-hornex/domain"
+
 type UserModel struct {
 	FirstName   string `gorm:"first_name" json:"firstName"`
 	LastName    string `json:"lastName"`
@@ -8,4 +10,11 @@ type UserModel struct {
 	Password    string `json:"password"`
 	CreatedAt   string `json:"createdAt"`
 	UpdatedAt   string `json:"updatedAt"`
+}
+
+type PostgresUserRepositoryImpl struct {
+}
+
+func (r *PostgresUserRepositoryImpl) Insert(user domain.UserParams) (domain.User, error) {
+	return domain.User{}, nil
 }
