@@ -46,15 +46,23 @@ func main() {
 
 	// Routers (Handlers)
 	app.Post("/api/users", func(c *fiber.Ctx) error {
-		var user domain.User
+		var newUser domain.User
 
-		if err := c.BodyParser(&user); err != nil {
+		if err := c.BodyParser(&newUser); err != nil {
 			return err
 		}
 
-		user.ID = len(db.Users) + 1
+		for i := 0; i < len(db.Users); i++ {
+			user := db.Users[i]
 
-		db.Insert(user)
+			if user.Email == newUser.Email {
+				return c.Status(http.StatusBadRequest).SendString("This email is already in use.")
+			}
+		}
+
+		newUser.ID = len(db.Users) + 1
+
+		db.Insert(newUser)
 
 		fmt.Println(db.Users)
 
