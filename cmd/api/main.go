@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/pedrosantosbr/proto-hornex/domain"
@@ -77,7 +78,23 @@ func main() {
 	})
 
 	app.Get("/api/users/:id", func(c *fiber.Ctx) error {
-		return c.SendString(fmt.Sprintf("GET /api/users/%s", c.Params("id")))
+		userId, _ := strconv.Atoi(c.Params("id"))
+
+		var userFound domain.User
+
+		for i := 0; i < len(db.Users); i++ {
+			user := db.Users[i]
+
+			if userId == user.ID {
+				userFound = user
+			}
+		}
+
+		if userFound.ID == 0 {
+			return c.Status(404).SendString("User was not found.")
+		}
+
+		return c.JSON(userFound)
 	})
 
 	app.Delete("/api/users/:id", func(c *fiber.Ctx) error {
