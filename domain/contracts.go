@@ -28,3 +28,12 @@ type UserParams struct {
 type UserRepository interface {
 	Insert(user UserParams) (User, error)
 }
+
+// SOLID [I]: Interface Segregation Principle
+type UserService interface {
+	RegisterNewUser(userParams UserParams) (User, error)
+	UpdateUser(userParams UserParams) (User, error)
+	DeactivateUser(userParams UserParams) (User, error)
+	GetUser(userParams UserParams) (User, error)
+	GetUsers(userParams UserParams) ([]User, error)
+}

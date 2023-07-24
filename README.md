@@ -40,3 +40,27 @@ RegisterUserUseCase (UML)
 `{
   "id": ""
 }`
+
+# Challenge
+
+Build a API REST in Go
+
+# Rules
+
+- Entity (Use Cases)
+- Repository (DB)
+- Service (Business Logic)
+- Router (Handlers) (HTTP)
+- Validator (Checks for errors)
+
+# Entities
+
+- User
+
+# Use Cases (CRUD)
+
+- Create User Use Case
+- Update User Use Case
+- Delete User Use Case
+- List Users Use Case
+- Get User Use Case

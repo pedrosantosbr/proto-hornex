@@ -3,44 +3,34 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
+	"github.com/gofiber/fiber/v2"
 )
 
-type CreateUserRequest struct {
-	FirstName   string `json:"firstName"`
-	LastName    string `json:"lastName"`
-	Email       string `json:"email"`
-	DateOfBirth string `json:"dateOfBirth"`
-	Password    string `json:"password"`
-}
-
-type CreateUserResponse struct {
-	ID uint8 `json:"email"`
-}
-
 func main() {
+	app := fiber.New()
 
-	router := chi.NewRouter()
+	// Routers (Handlers)
 
-	router.Post("/users", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("POST /users", r.Body)
-		// var req CreateUserRequest
-		// if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		// 	renderErrorResponse(w, r, "invalid request",
-		// 		internal.WrapErrorf(err, internal.ErrorCodeInvalidArgument, "json decoder"))
-
-		// 	return
-		// }
-
-		render.Status(r, http.StatusOK)
-		render.JSON(w, r, CreateUserResponse{ID: 1})
+	app.Post("/api/users", func(c *fiber.Ctx) error {
+		return c.SendString("POST /api/users")
 	})
 
-	err := http.ListenAndServe(":3000", router)
-	if err != nil {
-		log.Println(err)
-	}
+	app.Get("/api/users", func(c *fiber.Ctx) error {
+		return c.SendString("GET /api/users")
+	})
+
+	app.Get("/api/users/:id", func(c *fiber.Ctx) error {
+		return c.SendString(fmt.Sprintf("GET /api/users/%s", c.Params("id")))
+	})
+
+	app.Delete("/api/users/:id", func(c *fiber.Ctx) error {
+		return c.SendString(fmt.Sprintf("GET /api/users/%s", c.Params("id")))
+	})
+
+	app.Put("/api/users/:id", func(c *fiber.Ctx) error {
+		return c.SendString(fmt.Sprintf("PUT /api/users/%s", c.Params("id")))
+	})
+
+	log.Fatal(app.Listen(":9234"))
 }
