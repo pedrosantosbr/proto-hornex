@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"reflect"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -20,12 +21,25 @@ func (db *DB) Insert(user *domain.User) error {
 	return nil
 }
 
-func (db *DB) Find(id string) domain.User {
+func (db *DB) Find(id string) *domain.User {
 	userId, _ := strconv.Atoi(id)
-	return db.Users[userId]
+
+	for i := 0; i < len(db.Users); i++ {
+		user := &db.Users[i]
+
+		if userId == user.ID {
+			return user
+		}
+	}
+
+	return nil
 }
 
-func (db *DB) Update(id int, params domain.User) error {
+func (db *DB) Deactivate(user *domain.User) {
+	user.Active = false
+}
+
+/* func (db *DB) Update(id int, params domain.User) error {
 	for i, u := range db.Users {
 		if u.ID == id {
 			params.ID = id
@@ -35,6 +49,35 @@ func (db *DB) Update(id int, params domain.User) error {
 	}
 
 	return fmt.Errorf("user not found")
+} */
+
+func (db *DB) Update(id int, params domain.User) error {
+
+	for i, u := range db.Users {
+		if u.ID == id {
+			params.ID = id
+			// db.Users[i] = params
+
+			mergeStruct[domain.User](&db.Users[i], params)
+			return nil
+		}
+	}
+
+	return fmt.Errorf("user not found")
+}
+
+func mergeStruct[T interface{}](m *T, toM T) {
+	mVal := reflect.ValueOf(m).Elem()
+	toMVal := reflect.ValueOf(toM)
+
+	for i := 0; i < mVal.NumField(); i++ {
+		mField := mVal.Field(i)
+		toMField := toMVal.Field(i)
+
+		if !toMField.IsZero() {
+			mField.Set(toMField)
+		}
+	}
 }
 
 func (db *DB) GetAll() ([]domain.User, error) {
@@ -81,19 +124,11 @@ func main() {
 	})
 
 	app.Get("/api/users/:id", func(c *fiber.Ctx) error {
-		userId, _ := strconv.Atoi(c.Params("id"))
+		userId := c.Params("id")
 
-		var userFound domain.User
+		userFound := db.Find(userId)
 
-		for i := 0; i < len(db.Users); i++ {
-			user := db.Users[i]
-
-			if userId == user.ID {
-				userFound = user
-			}
-		}
-
-		if userFound.ID == 0 {
+		if userFound == nil {
 			return c.Status(http.StatusNotFound).SendString("User was not found.")
 		}
 
@@ -101,21 +136,15 @@ func main() {
 	})
 
 	app.Delete("/api/users/:id", func(c *fiber.Ctx) error {
-		userId, _ := strconv.Atoi(c.Params("id"))
+		userId := c.Params("id")
 
-		var userFound *domain.User
+		userFound := db.Find(userId)
 
-		for i := 0; i < len(db.Users); i++ {
-			userFound = &db.Users[i]
-
-			if userId == userFound.ID {
-				userFound.Active = false
-			}
-		}
-
-		if userFound.ID == 0 {
+		if userFound == nil {
 			return c.Status(http.StatusNotFound).SendString("User was not found.")
 		}
+
+		db.Deactivate(userFound)
 
 		return c.SendStatus(http.StatusNoContent)
 	})
