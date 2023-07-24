@@ -9,7 +9,6 @@ type User struct {
 	DateOfBirth string `json:"dateOfBirth"` // ISO 8601
 	Active      bool   `json:"active"`
 	Email       string `json:"email"`
-	Password    string `json:"password"`
 }
 
 // func (user User) Validate() error {
