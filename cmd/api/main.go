@@ -47,7 +47,7 @@ func main() {
 
 	// Routers (Handlers)
 	app.Post("/api/users", func(c *fiber.Ctx) error {
-		var newUser domain.User
+		var newUser = domain.User{Active: true}
 
 		if err := c.BodyParser(&newUser); err != nil {
 			return err
@@ -91,14 +91,30 @@ func main() {
 		}
 
 		if userFound.ID == 0 {
-			return c.Status(404).SendString("User was not found.")
+			return c.Status(http.StatusNotFound).SendString("User was not found.")
 		}
 
 		return c.JSON(userFound)
 	})
 
 	app.Delete("/api/users/:id", func(c *fiber.Ctx) error {
-		return c.SendString(fmt.Sprintf("GET /api/users/%s", c.Params("id")))
+		userId, _ := strconv.Atoi(c.Params("id"))
+
+		var userFound *domain.User
+
+		for i := 0; i < len(db.Users); i++ {
+			userFound = &db.Users[i]
+
+			if userId == userFound.ID {
+				userFound.Active = false
+			}
+		}
+
+		if userFound.ID == 0 {
+			return c.Status(http.StatusNotFound).SendString("User was not found.")
+		}
+
+		return c.SendStatus(http.StatusNoContent)
 	})
 
 	app.Put("/api/users/:id", func(c *fiber.Ctx) error {
