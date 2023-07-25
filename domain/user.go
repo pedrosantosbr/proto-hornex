@@ -1,26 +1,35 @@
 package domain
 
-// import validation "github.com/go-ozzo/ozzo-validation/v4"
+import (
+	"time"
+
+	"github.com/asaskevich/govalidator"
+)
 
 type User struct {
-	ID          int    `json:"id"`
-	FirstName   string `json:"firstName"`
-	LastName    string `json:"lastName"`
-	DateOfBirth string `json:"dateOfBirth"` // ISO 8601
-	Active      bool   `json:"active"`
-	Email       string `json:"email"`
+	ID          string    `json:"id" valid:"uuid" gorm:"type:uuid;primary_key"`
+	FirstName   string    `json:"firstName" valid:"notnull" gorm:"type:varchar(255)"`
+	LastName    string    `json:"lastName" valid:"notnull" gorm:"type:varchar(255)"`
+	DateOfBirth time.Time `json:"dateOfBirth" valid:"notnull" gorm:"type:date"` // ISO 8601
+	Active      bool      `json:"active" valid:"notnull" gorm:"type:boolean"`
+	Email       string    `json:"email" valid:"notnull" gorm:"type:varchar(255);unique"`
 }
 
-// func (user User) Validate() error {
-// 	if err := validation.ValidateStruct(&user,
-// 		validation.Field(&user.Email, validation.Required),
-// 		validation.Field(&user.Password, validation.Required),
-// 		validation.Field(&user.FirstName),
-// 		validation.Field(&user.LastName),
-// 		validation.Field(&user.DateOfBirth),
-// 	); err != nil {
-// 		return WrapErrorf(err, ErrorCodeInvalidArgument, "invalid values")
-// 	}
+func init() {
+	govalidator.SetFieldsRequiredByDefault(true)
+}
 
-// 	return nil
-// }
+func NewUser() *User {
+	return &User{}
+}
+
+func (u *User) Validate() error {
+
+	_, err := govalidator.ValidateStruct(u)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

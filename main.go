@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -9,13 +10,17 @@ import (
 
 	"github.com/go-chi/render"
 	"github.com/pedrosantosbr/proto-hornex/domain"
+	"github.com/pedrosantosbr/proto-hornex/framework/database"
 )
 
 func main() {
+	dbConnection := database.NewDbTest()
+
 	app := chi.NewRouter()
 
 	// Routers (Handlers)
 	app.Post("/api/users", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("DB", dbConnection)
 		var newUser = domain.User{Active: true}
 
 		if err := json.NewDecoder(r.Body).Decode(&newUser); err != nil {
@@ -27,7 +32,6 @@ func main() {
 	})
 
 	app.Get("/api/users", func(w http.ResponseWriter, r *http.Request) {
-
 		render.JSON(w, r, "OK")
 	})
 

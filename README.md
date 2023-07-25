@@ -57,6 +57,11 @@ Build a API REST in Go
 
 - User
 
+* firstName
+* lastName
+* email
+* dateOfBirth
+
 # Use Cases (CRUD)
 
 - Create User Use Case
