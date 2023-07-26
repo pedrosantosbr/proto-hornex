@@ -29,7 +29,8 @@ func NewDbTest() *gorm.DB {
 	dbInstance := NewDb()
 	dbInstance.Env = "test"
 	dbInstance.DbTypeTest = "sqlite3"
-	dbInstance.DsnTest = ":memory:"
+	// project path
+	dbInstance.DsnTest = "/home/hert/Documents/study/golang/proto-hornex/framework/database/database.db"
 	dbInstance.AutoMigrateDb = true
 	dbInstance.Debug = true
 
@@ -42,12 +43,20 @@ func NewDbTest() *gorm.DB {
 	connection.AutoMigrate(&domain.User{})
 
 	connection.Create(domain.User{
+
 		FirstName:   "name",
 		LastName:    "last",
 		DateOfBirth: time.Now(),
 		Active:      true,
 		Email:       "name@email.com",
-		Model:       gorm.Model{ID: 1, CreatedAt: time.Now(), UpdatedAt: time.Now(), DeletedAt: nil},
+	})
+
+	connection.Create(domain.User{
+		FirstName:   "name",
+		LastName:    "last",
+		DateOfBirth: time.Now(),
+		Active:      true,
+		Email:       "name2@email.com",
 	})
 
 	return connection
