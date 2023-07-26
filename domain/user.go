@@ -4,14 +4,16 @@ import (
 	"time"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/jinzhu/gorm"
 )
 
 type User struct {
-	ID          string    `json:"id" valid:"uuid" gorm:"type:uuid;primary_key"`
+	gorm.Model
+	// ID          string    `json:"id" valid:"uuid" gorm:"type:uuid"`
 	FirstName   string    `json:"firstName" valid:"notnull" gorm:"type:varchar(255)"`
 	LastName    string    `json:"lastName" valid:"notnull" gorm:"type:varchar(255)"`
-	DateOfBirth time.Time `json:"dateOfBirth" valid:"notnull" gorm:"type:date"` // ISO 8601
-	Active      bool      `json:"active" valid:"notnull" gorm:"type:boolean"`
+	DateOfBirth time.Time `json:"dateOfBirth" valid:"notnull" gorm:"type:datetime"` // ISO 8601
+	Active      bool      `json:"active" valid:"notnull" gorm:"type:bool"`
 	Email       string    `json:"email" valid:"notnull" gorm:"type:varchar(255);unique"`
 }
 

@@ -69,3 +69,6 @@ Build a API REST in Go
 - Delete User Use Case
 - List Users Use Case
 - Get User Use Case
+
+
+https://github.com/codeedu/microsservico-encoder/blob/master/domain/video.go

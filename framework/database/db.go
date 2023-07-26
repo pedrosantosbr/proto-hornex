@@ -2,9 +2,11 @@ package database
 
 import (
 	"log"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+
 	"github.com/pedrosantosbr/proto-hornex/domain"
 )
 
@@ -38,6 +40,15 @@ func NewDbTest() *gorm.DB {
 	}
 
 	connection.AutoMigrate(&domain.User{})
+
+	connection.Create(domain.User{
+		FirstName:   "name",
+		LastName:    "last",
+		DateOfBirth: time.Now(),
+		Active:      true,
+		Email:       "name@email.com",
+		Model:       gorm.Model{ID: 1, CreatedAt: time.Now(), UpdatedAt: time.Now(), DeletedAt: nil},
+	})
 
 	return connection
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -14,13 +13,14 @@ import (
 )
 
 func main() {
-	dbConnection := database.NewDbTest()
+	db := database.NewDbTest()
+
+	defer db.Close()
 
 	app := chi.NewRouter()
 
 	// Routers (Handlers)
 	app.Post("/api/users", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("DB", dbConnection)
 		var newUser = domain.User{Active: true}
 
 		if err := json.NewDecoder(r.Body).Decode(&newUser); err != nil {
@@ -32,7 +32,12 @@ func main() {
 	})
 
 	app.Get("/api/users", func(w http.ResponseWriter, r *http.Request) {
-		render.JSON(w, r, "OK")
+		users := []domain.User{}
+
+		db.Find(&users)
+
+		render.Status(r, http.StatusOK)
+		render.JSON(w, r, users)
 	})
 
 	/*
@@ -80,7 +85,7 @@ func main() {
 
 	srv := http.Server{Addr: ":9234", Handler: app}
 
-	srv.ListenAndServe()
+	log.Fatal(srv.ListenAndServe())
 
-	log.Fatal()
+	defer srv.Close()
 }
